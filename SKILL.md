@@ -167,24 +167,29 @@ a) Confirm the vault location. Suggest an independent directory (e.g. `~/people/
 b) Check if the user already has Obsidian vaults (run `ls ~/Documents` or ask).
    If they do, this reinforces the isolation argument.
 
-c) Create the directory structure:
-   ```
-   mkdir -p vault-root/{contacts,templates,tags/{school,field,city}}
-   ```
+c) Execute the full initialization sequence. **See `assets/onboarding-example.md` for
+   a complete walkthrough with expected output at each step.**
 
-d) Copy `assets/contact-template.md` to `vault-root/templates/contact.md`.
+**Initialization checklist:**
 
-e) Create initial `README.md` recording the design decisions and usage conventions.
+| Step | Action | Output |
+|------|--------|--------|
+| 1 | `mkdir -p vault-root/{contacts,templates,tags/{school,field,city}}` | Directory tree |
+| 2 | Copy `assets/contact-template.md` → `vault-root/templates/contact.md` | Template file |
+| 3 | Create `README.md` with design decisions and usage conventions | README |
+| 4 | Create `INDEX.md` with Contact Overview table (empty rows) + three tag navigation tables (empty rows) | INDEX |
+| 5 | Create `.trash/` directory | Safe archive |
+| 6 | No tag files yet — they are created on-demand when the first contact references them | — |
 
-f) Create initial `INDEX.md` with the table structure (empty rows, to be filled).
-
-g) Create the `.trash/` directory for safe archiving of legacy files.
-   Use `mv` (not `rm`) to move files there — Obsidian auto-ignores it, and recovery is possible.
+**What NOT to do at initialization:**
+- Don't pre-create tag files — wait until a contact actually needs them.
+- Don't pre-fill INDEX rows — add them as contacts are created.
+- Don't use `rm` for cleanup — use `.trash/`.
 
 ### 2. Add a New Contact
 
-Before doing anything, **search INDEX.md** for the person's name, alias, or platform ID
-to check for duplicates. If a similar entry exists, see section 2b.
+**Before creating any file, search INDEX.md for the person's name, alias, or platform ID
+to check for duplicates. If a similar entry exists, see section 2b.**
 
 a) Collect information from the user (not all at once — ask progressively):
    - How do you address them? (nickname)
@@ -354,12 +359,16 @@ characters can break `trash` CLI tools).
   Copy to `templates/contact.md` during vault initialization.
 - `assets/INDEX-template.md` — Full INDEX.md skeleton with empty tables.
   Copy to `INDEX.md` during vault initialization, then fill in as contacts are added.
+- `assets/onboarding-example.md` — Complete walkthrough of vault initialization +
+  first contact entry, with expected output at each step. Read this when setting up
+  a new vault for the first time.
 
 ## Quick Reference
 
 | Action | Steps |
 |--------|-------|
-| New contact | Collect info → create `contacts/{name}.md` → update INDEX → create tags if needed |
+| First-time setup | Follow `assets/onboarding-example.md` step by step |
+| New contact | Collect info → search INDEX for duplicates → create `contacts/{name}.md` → update INDEX → create tags if needed |
 | Who to ask about X? | Search INDEX for trigger tag → list matching contacts |
 | After talking to someone | Update `last_contact` in their file |
 | Person changed schools/jobs | Update `identity` + `trigger_tags` → update INDEX → add/remove tag files as needed |
