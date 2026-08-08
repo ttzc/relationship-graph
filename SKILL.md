@@ -230,8 +230,21 @@ Present the conflict to the user and ask before writing anything.
 
 - **No silent overwrite**: if an existing field disagrees with new information, stop and ask.
 - **No silent merge**: never combine two entries automatically — the user must confirm.
-- **No "probably the same"**: if similarity is below near-certainty (same name + same school + same platform), treat as distinct contacts until the user says otherwise.
+- **Ask before any merge, even if "probably the same"**: similarity is never grounds for merging on your own. Show the two entries side by side with the matching fields highlighted, ask the user to confirm they are the same person, and only merge after explicit approval. Treat as distinct contacts by default.
 - **Log the decision**: after the user resolves the conflict, add a brief note in the contact's `notes` field (e.g. "合并自 '张小明.md' — 2026-08-08") so the history is traceable.
+
+**How to ask (example dialogue):**
+
+```
+INDEX 中找到一个相似条目：
+  现有：张小明 — 姚班 2024 — [[Tsinghua University]] — QQ: 12345
+  新信息：张明 — 清华 大四 — CS — QQ: 12345
+
+两个条目是否指向同一个人？
+  1. 是同一个人，合并到"张小明"（请确认合并方式）
+  2. 不是同一个人，新增一个独立联系人"张明"
+  3. 先不处理，我之后再确认
+```
 
 ### 4. AI Associative Matching
 
