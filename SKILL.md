@@ -257,7 +257,7 @@ During conversation, when a trigger tag keyword appears:
 - Update `last_contact` after each meaningful interaction.
 - Update `help_areas` and `trigger_tags` when discovering new capabilities or role changes.
 - **Sync INDEX.md**: whenever a contact's `trigger_tags`, `strength`, or `last_contact` changes, update their row in the Contact Overview table and the tag navigation tables in the same session.
-- Periodically audit the graph: check for broken wiki-links, redundant tag-to-tag edges, and INDEX drift (see section 6).
+- Periodically audit the graph: run `scripts/audit_graph.py --report`, fix broken wiki-links, redundant tag-to-tag edges, and INDEX drift (see section 6).
 
 ## Graph Hygiene Audit
 
@@ -273,10 +273,21 @@ Before checking tag edges, verify that INDEX.md itself is consistent:
 
 3. **Wiki-links in INDEX**: All `[[wiki-links]]` in INDEX.md (tag file references, contact links) must resolve to existing files. Broken links indicate a renamed or deleted file that wasn't updated in INDEX.
 
-### Tag Edge Hygiene
+### Automated Audit with `audit_graph.py`
 
-4. **Contact ↔ Tag**: Every trigger tag in every contact file must point to an
-   actually existing tag file. Use a script or manual search to verify.
+After verifying INDEX.md manually (steps 1–3 above), run the bundled script
+`scripts/audit_graph.py` to automate the remaining checks:
+
+```bash
+python scripts/audit_graph.py <vault_path>            # summary to stdout
+python scripts/audit_graph.py <vault_path> --report   # full human-readable report
+python scripts/audit_graph.py <vault_path> --json     # machine-readable JSON
+```
+
+The script checks:
+
+4. **Contact ↔ Tag**: Every `trigger_tag` in every contact file must point to an
+   actually existing tag file. The script reports any broken links.
 
 5. **School ↔ City**: Allowed (structural edge — location relationship).
 
@@ -288,22 +299,18 @@ Before checking tag edges, verify that INDEX.md itself is consistent:
 8. **All other cross-edges**: Should be deleted. If two tags are connected only through
    shared contacts, that edge is useless — the contact node IS the natural bridge.
 
+The script also reports orphan contacts (no tags), orphan tags (no contacts),
+tag usage rankings, and redundant tag-to-tag edges for manual review.
+
 ### Audit Execution
 
-For batch operations (e.g. rewriting all trigger tags across many contact files):
-
-1. Generate a mapping table: contact → current tags → desired new tags.
-2. Write a script that iterates contact files and replaces trigger tag blocks.
-   Use the Edit tool for small changes, a Python/Bash script for bulk changes.
-3. After rewriting, verify all wiki-links resolve:
-   ```bash
-   # Count all unique wiki-link targets across contact files
-   grep -roh '\[\[[^]]*\]\]' contacts/ | sort -u | sed 's/\[\[//;s/\]\]//' | while read tag; do
-     # Check if corresponding file exists in tags/ (any layer)
-   done
-   ```
-4. **Verify INDEX.md is in sync**: check that every contact file has a row in the Contact Overview table, and every tag file is listed in the tag navigation tables.
-5. The only expected "broken" links are template example text in `templates/contact.md`.
+1. Verify INDEX.md is in sync manually (see INDEX Consistency above).
+2. Run `python scripts/audit_graph.py <vault_path> --report` to generate the full report.
+3. Review the report:
+   - Fix any broken wiki-links.
+   - Remove redundant tag-to-tag edges (contact-bridged only).
+   - Address orphan contacts (add tags) or orphan tags (deprecate or link them).
+4. Re-run the script to confirm all issues are resolved.
 
 ### Removing or Archiving a Contact
 
@@ -319,6 +326,10 @@ When restructuring (e.g. changing tag naming conventions), do NOT use `rm` for r
 Instead: `mv old-file.md vault-root/.trash/`. Obsidian auto-ignores `.trash/`.
 This avoids OS-level trash issues (especially on Windows where paths with Chinese
 characters can break `trash` CLI tools).
+
+## Scripts
+
+- `scripts/audit_graph.py` — Automated graph integrity checker. Scans the vault for broken wiki-links, orphan contacts/tags, redundant tag-to-tag edges, and generates a human-readable report or JSON output. Run after any batch import or tag restructuring.
 
 ## Template Resources
 
@@ -336,4 +347,4 @@ characters can break `trash` CLI tools).
 | After talking to someone | Update `last_contact` in their file |
 | Person changed schools/jobs | Update `identity` + `trigger_tags` → update INDEX → add/remove tag files as needed |
 | Remove / archive contact | Move file to `.trash/` → remove INDEX row → deprecate orphan tags if needed |
-| Full audit | Verify INDEX completeness → check all wiki-links → check tag edges → remove redundant cross-edges |
+| Full audit | Run `scripts/audit_graph.py --report` → fix issues → re-run to confirm |
