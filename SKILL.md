@@ -183,6 +183,9 @@ g) Create the `.trash/` directory for safe archiving of legacy files.
 
 ### 2. Add a New Contact
 
+Before doing anything, **search INDEX.md** for the person's name, alias, or platform ID
+to check for duplicates. If a similar entry exists, see section 2b.
+
 a) Collect information from the user (not all at once — ask progressively):
    - How do you address them? (nickname)
    - Which platform? What's their ID? (QQ/WeChat/Bilibili/Luogu/CF...)
@@ -205,18 +208,43 @@ d) For any trigger tag that doesn't yet exist,
 e) After adding, do a quick check: do all `[[wiki-links]]` point to existing files?
    The only exception is template example text (like `[[tag-name]]`).
 
-### 3. AI Associative Matching
+### 2b. Conflict Resolution
+
+Before creating any file, **always search INDEX.md first** to check whether this person
+already has an entry under a different name, alias, or platform ID.
+
+When conflicting information is found during search or update, **never guess**.
+Present the conflict to the user and ask before writing anything.
+
+**Common conflict scenarios:**
+
+| Scenario | Action |
+|----------|--------|
+| Two entries with similar names (e.g. "张明" and "张小明") | Show both entries with their identity fields, ask if they are the same person |
+| Same person in two files (different platforms used to create them) | Show both, ask which to keep as canonical; merge by user direction |
+| Outdated identity (e.g. "大四" but the user knows they graduated) | Show current value and what the user just said, ask which to use |
+| Same trigger tag pointing to two different people with same name | Show both contacts, ask the user to disambiguate |
+| User contradicts their own previous entry | Show the old value, ask the user to confirm the update — don't silently overwrite |
+
+**Rules:**
+
+- **No silent overwrite**: if an existing field disagrees with new information, stop and ask.
+- **No silent merge**: never combine two entries automatically — the user must confirm.
+- **No "probably the same"**: if similarity is below near-certainty (same name + same school + same platform), treat as distinct contacts until the user says otherwise.
+- **Log the decision**: after the user resolves the conflict, add a brief note in the contact's `notes` field (e.g. "合并自 '张小明.md' — 2026-08-08") so the history is traceable.
+
+### 4. AI Associative Matching
 
 During conversation, when a trigger tag keyword appears:
 - Look up `INDEX.md` → match tags → list related contacts
 - Proactively remind: "On this topic, [Person] might be able to help."
 - When the user says "find someone to ask about X", use tags to match contacts.
 
-### 4. Regular Maintenance
+### 5. Regular Maintenance
 - Update `last_contact` after each meaningful interaction.
 - Update `help_areas` and `trigger_tags` when discovering new capabilities or role changes.
 - **Sync INDEX.md**: whenever a contact's `trigger_tags`, `strength`, or `last_contact` changes, update their row in the Contact Overview table and the tag navigation tables in the same session.
-- Periodically audit the graph: check for broken wiki-links, redundant tag-to-tag edges, and INDEX drift (see section 5).
+- Periodically audit the graph: check for broken wiki-links, redundant tag-to-tag edges, and INDEX drift (see section 6).
 
 ## Graph Hygiene Audit
 
