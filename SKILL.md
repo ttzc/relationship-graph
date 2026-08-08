@@ -246,6 +246,23 @@ INDEX 中找到一个相似条目：
   3. 先不处理，我之后再确认
 ```
 
+### 2c. Tag Management — Ask Before Deciding
+
+Any tag-related decision that has lasting structural impact on the vault must go through
+the user. **Do not create, merge, rename, or deprecate a tag on your own.**
+
+When any of the following situations arise, stop and ask:
+
+| Situation | What to ask the user |
+|-----------|---------------------|
+| Conversation introduces a concept with no matching tag (e.g. "大模型") | "Should I create a new tag `[[大模型]]` under `tags/field/`?" |
+| Two concepts could be the same or different (e.g. "AI" vs "大模型") | Show both candidates, ask whether they are distinct or should be merged |
+| A contact's `trigger_tags` references a tag that doesn't exist | "The tag `[[X]]` doesn't exist yet — create it, or remove it from this contact's tags?" |
+| A tag file exists but no contact references it | "The tag `[[X]]` has no contacts. Keep it, or move it to `.trash/`?" |
+| User suggests restructuring tags (e.g. renaming, splitting a layer) | Show the proposed change and its scope (which files, which contacts), ask for confirmation before proceeding |
+
+The general pattern: when in doubt, present the options and let the user choose.
+
 ### 4. AI Associative Matching
 
 During conversation, when a trigger tag keyword appears:
