@@ -215,23 +215,36 @@ During conversation, when a trigger tag keyword appears:
 ### 4. Regular Maintenance
 - Update `last_contact` after each meaningful interaction.
 - Update `help_areas` and `trigger_tags` when discovering new capabilities or role changes.
-- Periodically audit the graph: check for broken wiki-links and redundant tag-to-tag edges.
+- **Sync INDEX.md**: whenever a contact's `trigger_tags`, `strength`, or `last_contact` changes, update their row in the Contact Overview table and the tag navigation tables in the same session.
+- Periodically audit the graph: check for broken wiki-links, redundant tag-to-tag edges, and INDEX drift (see section 5).
 
 ## Graph Hygiene Audit
 
 When performing a full-audit (e.g., after batch imports or tag restructuring):
 
-1. **Contact ↔ Tag**: Every trigger tag in every contact file must point to an
+### INDEX Consistency
+
+Before checking tag edges, verify that INDEX.md itself is consistent:
+
+1. **Contact Overview completeness**: Every `.md` file in `contacts/` (excluding `.trash/`) must appear as a row in INDEX.md's Contact Overview table. No orphan contact files, no INDEX rows pointing to missing files.
+
+2. **Tag navigation completeness**: Every tag file that exists in `tags/{school,field,city}/` must appear in the corresponding table in INDEX.md. Every tag listed in a table must have a corresponding file.
+
+3. **Wiki-links in INDEX**: All `[[wiki-links]]` in INDEX.md (tag file references, contact links) must resolve to existing files. Broken links indicate a renamed or deleted file that wasn't updated in INDEX.
+
+### Tag Edge Hygiene
+
+4. **Contact ↔ Tag**: Every trigger tag in every contact file must point to an
    actually existing tag file. Use a script or manual search to verify.
 
-2. **School ↔ City**: Allowed (structural edge — location relationship).
+5. **School ↔ City**: Allowed (structural edge — location relationship).
 
-3. **City ↔ City**: Only same-region or adjacent cities allowed (e.g. Nanjing ↔ Shanghai).
+6. **City ↔ City**: Only same-region or adjacent cities allowed (e.g. Nanjing ↔ Shanghai).
 
-4. **Field ↔ Field**: Only same-system domains allowed (e.g. OI ↔ ICPC, EE ↔ CS).
+7. **Field ↔ Field**: Only same-system domains allowed (e.g. OI ↔ ICPC, EE ↔ CS).
    Random links like "Medicine ↔ Finance" should be removed.
 
-5. **All other cross-edges**: Should be deleted. If two tags are connected only through
+8. **All other cross-edges**: Should be deleted. If two tags are connected only through
    shared contacts, that edge is useless — the contact node IS the natural bridge.
 
 ### Audit Execution
@@ -248,7 +261,17 @@ For batch operations (e.g. rewriting all trigger tags across many contact files)
      # Check if corresponding file exists in tags/ (any layer)
    done
    ```
-4. The only expected "broken" links are template example text in `templates/contact.md`.
+4. **Verify INDEX.md is in sync**: check that every contact file has a row in the Contact Overview table, and every tag file is listed in the tag navigation tables.
+5. The only expected "broken" links are template example text in `templates/contact.md`.
+
+### Removing or Archiving a Contact
+
+When a contact is no longer relevant (e.g. lost touch, duplicate entry):
+
+1. **Move the file to `.trash/`**: `mv contacts/{name}.md vault-root/.trash/`. Never use `rm`.
+2. **Update INDEX.md Contact Overview**: Remove or strike-through that row. Add a note like "Archived 2026-08-08 — moved to `.trash/`" so the history is visible.
+3. **Update tag navigation tables**: If this person was the *only* contact under a tag, consider whether the tag itself should be deprecated (move tag file to `.trash/` too, after confirming no other contacts reference it).
+4. **Do NOT remove shared-friends wiki-links**: Even archived contacts leave traces. The `notes` field in other contacts may still reference them via `[[wiki-links]]`.
 
 ### Moving Legacy Files
 When restructuring (e.g. changing tag naming conventions), do NOT use `rm` for removal.
@@ -271,4 +294,5 @@ characters can break `trash` CLI tools).
 | Who to ask about X? | Search INDEX for trigger tag → list matching contacts |
 | After talking to someone | Update `last_contact` in their file |
 | Person changed schools/jobs | Update `identity` + `trigger_tags` → update INDEX → add/remove tag files as needed |
-| Full audit | Verify all wiki-links → check tag edges → remove redundant cross-edges |
+| Remove / archive contact | Move file to `.trash/` → remove INDEX row → deprecate orphan tags if needed |
+| Full audit | Verify INDEX completeness → check all wiki-links → check tag edges → remove redundant cross-edges |
