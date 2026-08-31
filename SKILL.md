@@ -1,248 +1,260 @@
 ---
 name: relationship-graph
-description: "Build and manage a local personal relationship graph (Personal CRM) as an Obsidian vault. Structurally stores contacts with a three-layer atomic tag system (school/field/city), enabling AI to proactively suggest who can help when a topic comes up in conversation. Triggers: 人脉, 关系图谱, 通讯录, 联系人管理, 认识的人, 找谁帮忙, 人际关系, personal CRM, contact management, relationship network."
+description: "在本地构建并管理个人人脉关系图谱（Personal CRM），以 Obsidian vault 的形式存放。用三层原子标签（学校/方向/城市）结构化存储联系人，让 AI 在对话话题出现时主动推荐「可以问谁」。触发词：人脉, 关系图谱, 通讯录, 联系人管理, 认识的人, 找谁帮忙, 人际关系, personal CRM, contact management, relationship network."
 agent_created: true
 ---
 
-# Relationship Graph Builder
+# 人际关系图谱构建器
 
-## Overview
+## 概述
 
-This Skill provides a complete methodology for building a personal relationship graph —
-an AI-readable, structured knowledge base that turns scattered contact information
-(QQ, WeChat, business cards, etc.) into searchable, associative entries.
-The output is an Obsidian vault with contact files, a three-layer tag system,
-and a quick-reference index, supporting both AI-driven matching and graph visualization.
+本 Skill 提供一套完整的个人人脉关系图谱构建方法论——把零散的联系人信息
+（QQ、微信、名片等）变成一个 AI 可读、结构化的知识库，形成可检索、可联想的条目。
+最终产出是一个 Obsidian vault：联系人文件 + 三层标签体系 + 速查索引，
+同时支持 AI 联想匹配和图谱可视化。
 
-## When to Use
+## 何时使用
 
-- User wants to systematically manage their contacts (classmates, peers, mentors, partners).
-- User has many social-platform contacts (QQ/WeChat/etc.) but lacks structured information.
-- User wants AI to proactively surface "who to ask about X" when a topic arises.
-- User says things like "remember this person", "create a new contact", "who can help with X".
-- User is entering a new environment (university, job, community) and wants to map their network.
-- User mentions "building a relationship graph", "personal CRM", or "contact management".
+- 用户想系统化管理自己的人脉（同学、同辈、导师、合作伙伴）。
+- 用户有很多社交平台联系人（QQ/微信等），但缺乏结构化信息。
+- 用户希望 AI 在话题出现时主动提示"这件事可以问谁"。
+- 用户说"记一下这个人"、"新建一个联系人"、"谁可以帮我搞 X"。
+- 用户即将进入新环境（大学、公司、社群），想梳理自己的人脉网络。
+- 用户提到"关系图谱"、"personal CRM"、"人脉管理"。
 
-## Design Principles
+## 设计原则
 
-### Core Problem
-Traditional address books store only name + phone number, and AI cannot read them.
-Social app contact notes are too short and unstructured.
-None of them capture semantic information like "what can this person help with".
+### 核心问题
+传统通讯录只存姓名 + 电话，AI 读不了。
+社交软件的备注太短且无结构。
+它们都没有记录"这个人能帮什么"这类语义信息。
 
-### Solution
-A standalone Markdown knowledge base (Obsidian vault), one file per person,
-using **trigger tags** (`[[标签名]]`) that allow AI to automatically match contacts
-when relevant topics appear in conversation.
+### 解决方案
+一个独立的 Markdown 知识库（Obsidian vault），每人一个文件，
+用**触发标签**（`[[标签名]]`）让 AI 在对话出现相关话题时自动匹配联系人。
 
-### Key Design Decisions (from practice)
-1. **Independent vault, isolated from daily notes**: Contact data contains sensitive info
-   (platform IDs, personal background). Do not mix with public blogs or work notes.
-2. **Prioritize semi-familiar, high-potential contacts**: Close friends are already in your head.
-   The knowledge base's core value is in "not-that-close but potentially high-value" contacts.
-3. **File names use real names**: Aliases/nicknames go in fields, not filenames.
-   Pinyin can naturally suggest the real name.
-4. **Three-layer atomic tags**: Never create combo tags like "Peking University + Math".
-   Instead, school/field/city are three independent layers —
-   contact nodes become the bridges between different circles.
-5. **Graph hygiene — people are bridges, tags should not over-connect**:
-   Delete edges where two tags are linked only through shared contacts.
-   The contact nodes should be the network's bridge structure.
+### 关键设计决策（来自实践）
+1. **独立 vault，与日常笔记隔离**：联系人数据含敏感信息（平台 ID、个人背景），
+   不要与公开博客或工作笔记混放。
+2. **优先录入半熟、高潜力的联系人**：密友本来就在你脑子里。
+   知识库的核心价值在"不太熟但可能高价值"的联系人。
+3. **文件名用真名**：别名/昵称放在字段里，不放文件名。
+   拼音本身就能自然提示真名。
+4. **三层原子标签**：绝不创建"北大+数学"这类组合标签。
+   学校/方向/城市是三个独立层——
+   联系人节点本身就是不同圈层之间的桥梁。
+5. **图谱卫生——人是桥梁，标签之间不要过度连接**：
+   两个标签若仅因共享联系人而相连，删掉这条边。
+   桥接结构应由联系人节点承担。
 
-## Vault Structure
+## Vault 结构
 
 ```
 vault-root/
-├── README.md              # Usage conventions and design notes
-├── INDEX.md               # Quick-reference index + tag navigation (AI reads this first)
-├── contacts/              # One .md file per person
+├── README.md              # 使用约定与设计决策
+├── INDEX.md               # 速查索引 + 标签导航（AI 优先读取）
+├── contacts/              # 每人一个 .md 文件
 ├── templates/
-│   └── contact.md         # Contact entry template (copy from assets/)
+│   └── contact.md         # 联系人条目模板（从 assets/ 复制）
 └── tags/
-    ├── school/            # School tags (one file per school)
-    ├── field/             # Field/domain tags (one file per domain)
-    └── city/              # City tags (one file per city)
+    ├── school/            # 学校标签（每校一个文件）
+    ├── field/             # 方向/领域标签（每个领域一个文件）
+    └── city/              # 城市标签（每城一个文件）
 ```
 
-## Data Model
+## 数据模型
 
-### Contact File Frontmatter
+### 联系人文件布局
+
+> **权威来源：`assets/contact-template.md`。** 创建联系人时直接复制它。
+> 下面的代码块只是速览——活体 vault 中的字段名可能被本地化
+> （如用 `platform:` 而非 `platforms:`、用 `met:` 而非 `context:`）。
+> **写入前务必先读该 vault 自己的 `templates/contact.md` 和一个已有联系人文件。**
 
 ```yaml
----
-nickname: ""          # How the person is addressed (primary key; can be alias/nickname)
-real_name: ""         # Legal name (optional; leave empty if unknown)
-platforms:            # Platform IDs
+nickname: ""          # 怎么称呼这个人（主键；可以是别名/昵称）
+real_name: ""         # 法定姓名（可选；昵称即真名时留空）
+platforms:            # 平台 ID——至少填一个
   qq: ""
   wechat: ""
   bilibili: ""
-  luogu: ""           # Competitive programming platforms
+  luogu: ""           # 竞赛平台
   codeforces: ""
-  # ...add other platforms as needed
-identity: ""          # One-line identity description
-context: ""           # How did we meet? Where/when?
-strength: ""          # Relationship strength (e.g. best friend / acquaintance / online / not-close→expected-to-grow)
-last_contact: ""      # Date of last meaningful interaction (YYYY-MM-DD)
-help_areas: []        # What can this person help with? (e.g. ["CMC exam prep", "ICPC team formation"])
-trigger_tags: []      # Trigger tags in wiki-link format (e.g. ["[[Peking University]]", "[[OI Competition]]"])
-notes: ""             # Remarks, relationship boundaries, dos-and-don'ts
----
+  # ...按需添加其他平台
+identity: ""          # 一句话身份描述
+context: ""           # 怎么认识的？何时何地？
+strength: ""          # 关系强度：close（密友）/ acquaintance（熟识）/ casual（泛泛）/ not-close→expected-to-grow（不熟但预期会升温）
+last_contact: ""      # 最近一次有意义互动的日期（YYYY-MM-DD）
 ```
 
-### Trigger Tag Design
-Tags use natural language names (not IDs/codes). Each tag is a standalone `.md` file,
-connected via Obsidian wiki-links `[[Tag Name]]`.
+注意：模板把 YAML 块放在**正文内**（用 ```yaml 围栏），而不是 Obsidian frontmatter。
+`help_areas` / `trigger_tags` / `notes` 不作为 YAML 字段存在——
+它们是下面的四个正文小节：
 
-**Three-layer classification:**
+**正文小节**（按顺序）：
+1. `## 可帮事项（AI 联想的核心）` — 这个人能提供什么帮助，联想匹配的核心
+2. `## 触发标签` — wiki-link 形式的触发词，如 `[[北京大学]] [[OI 信息竞赛]]`
+3. `## 历史互动` — 谁帮过谁、关键对话事件，最新的在最后
+4. `## 备注` — 性格、边界、共同好友
 
-| Layer | Directory | Content | Edge Rules |
-|-------|-----------|---------|------------|
-| School | tags/school/ | Specific school names | School ↔ City (bidirectional) |
-| Field | tags/field/ | Domains/specialties (e.g. OI Competition, Finance) | Same-system fields may link (e.g. OI ↔ ICPC) |
-| City | tags/city/ | City names | Same-region cities may link |
+> 额外小节也没问题（如 `## 竞赛履历`）。某个话题反复出现时就加领域专属小节——
+> 结构化区块比自由散文更有利于日后召回。
 
-**Forbidden**: Never create "school + field" combo tags (e.g. `Peking University Math`).
-The contact node itself should bridge those dimensions.
+### 触发标签设计
+标签用自然语言命名（不是 ID/编码）。每个标签是一个独立 `.md` 文件，
+通过 Obsidian wiki-link `[[标签名]]` 连接。
 
-### Tag File Template
+**三层分类：**
 
-Each tag file in the `tags/` subdirectories should contain:
+| 层 | 目录 | 内容 | 边规则 |
+|----|------|------|--------|
+| 学校 | tags/school/ | 具体学校名 | 学校 ↔ 城市（双向） |
+| 方向 | tags/field/ | 领域/专业（如 OI 信息竞赛、金融） | 同体系领域可连（如 OI ↔ ICPC） |
+| 城市 | tags/city/ | 城市名 | 同区域城市可连 |
+
+**禁止**：绝不创建"学校+方向"组合标签（如 `北京大学数学`）。
+联系人节点本身就承担跨维度桥梁的角色。
+
+### 标签文件模板
+
+`tags/` 子目录下的每个标签文件应包含：
 ```markdown
 ---
-title: Tag Name
+title: 标签名
 type: tag
 ---
 
-# Tag Name
+# 标签名
 
-**When this triggers**: Brief description of when this tag is relevant.
+**触发场景**：简要描述什么时候这个话题会关联到此标签。
 
-## Related Contacts
-- [[Contact Name]] — one-line identity
+## 相关联系人
+- [[联系人姓名]] — 一句话身份
 ```
 
-### INDEX.md Structure
+### INDEX.md 结构
 
 ```markdown
-# Contact Index
+# 人脉索引
 
-> Quick-reference table: nickname | identity | trigger tags | strength | last contact
-> AI should read this file first for associative matching.
-> See individual contact files for full details.
+> 速查表：昵称 | 身份 | 触发标签 | 强度 | 最近联系 | 链接
+> AI 做联想匹配时优先读本文件。
+> 完整信息见 contacts/ 下的个人文件。
 
-## Contact Overview
+## 联系人总览
 
-| Nickname | Identity | Trigger Tags | Strength | Last Contact | Link |
-|----------|----------|-------------|----------|-------------|------|
+| 昵称 | 身份 | 触发标签 | 强度 | 最近联系 | 链接 |
+|------|------|----------|------|----------|------|
 | ... | ... | [[...]] [[...]] | ... | ... | [[...]] |
 
-## Search by Tag
+## 按标签检索
 
-### Schools
-| Tag | When to Trigger | Tag File |
-|-----|----------------|----------|
+### 学校
+| 标签 | 触发场景 | 标签文件 |
+|------|----------|----------|
 | ... | ... | [[...]] |
 
-### Fields
-| Tag | When to Trigger | Tag File |
-|-----|----------------|----------|
+### 专业方向
+| 标签 | 触发场景 | 标签文件 |
+|------|----------|----------|
 | ... | ... | [[...]] |
 
-### Cities
-| Tag | When to Trigger | Tag File |
-|-----|----------------|----------|
+### 城市
+| 标签 | 触发场景 | 标签文件 |
+|------|----------|----------|
 | ... | ... | [[...]] |
 ```
 
-## Workflow
+## 工作流
 
-### 1. Initialize the Vault
+### 1. 初始化 vault
 
-When the user expresses interest in building a relationship graph:
+当用户表达想建关系图谱时：
 
-a) Confirm the vault location. Suggest an independent directory (e.g. `~/people/` or `D:/people/`).
-   Explain why isolation matters: contacts contain sensitive info that should not
-   mix with public blogs or work notes.
+a) 确认 vault 位置。建议独立目录（如 `~/people/`）。
+   解释隔离的原因：联系人含敏感信息，不应与公开博客或工作笔记混放。
 
-b) Check if the user already has Obsidian vaults (run `ls ~/Documents` or ask).
-   If they do, this reinforces the isolation argument.
+b) 检查用户是否已有 Obsidian vault（`ls ~/Documents` 或直接问）。
+   如果有，正好强化"再开一个独立 vault"的隔离理由。
 
-c) Execute the full initialization sequence. **See `assets/onboarding-example.md` for
-   a complete walkthrough with expected output at each step.**
+c) 执行完整初始化流程。**每一步的最终产出形态见
+   `assets/onboarding-example.md` 的完整示例。**
 
-**Initialization checklist:**
+**初始化清单：**
 
-| Step | Action | Output |
-|------|--------|--------|
-| 1 | `mkdir -p vault-root/{contacts,templates,tags/{school,field,city}}` | Directory tree |
-| 2 | Copy `assets/contact-template.md` → `vault-root/templates/contact.md` | Template file |
-| 3 | Create `README.md` with design decisions and usage conventions | README |
-| 4 | Create `INDEX.md` with Contact Overview table (empty rows) + three tag navigation tables (empty rows) | INDEX |
-| 5 | Create `.trash/` directory | Safe archive |
-| 6 | No tag files yet — they are created on-demand when the first contact references them | — |
+| 步骤 | 动作 | 产出 |
+|------|------|------|
+| 1 | `mkdir -p vault-root/{contacts,templates,tags/{school,field,city}}` | 目录树 |
+| 2 | 复制 `assets/contact-template.md` → `vault-root/templates/contact.md` | 模板文件 |
+| 3 | 创建 `README.md`，写入设计决策和使用约定 | README |
+| 4 | 创建 `INDEX.md`：联系人总览表（空行）+ 三个标签导航表（空行） | INDEX |
+| 5 | 创建 `.trash/` 目录 | 安全归档 |
+| 6 | 标签文件先不建——等第一个联系人真正用到时按需创建 | — |
 
-**What NOT to do at initialization:**
-- Don't pre-create tag files — wait until a contact actually needs them.
-- Don't pre-fill INDEX rows — add them as contacts are created.
-- Don't use `rm` for cleanup — use `.trash/`.
+**初始化时不要做的事：**
+- 不要预建标签文件——等联系人真正需要时再建。
+- 不要预填 INDEX 行——随联系人录入逐行添加。
+- 不要用 `rm` 清理——用 `.trash/`。
 
-### 2. Add a New Contact
+### 2. 录入新联系人
 
-**Before creating any file, search INDEX.md for the person's name, alias, or platform ID
-to check for duplicates. If a similar entry exists, see section 2b.**
+**创建任何文件之前，先搜 INDEX.md**，用姓名、别名或平台 ID 查重。
+发现相似条目时，转 2b 节。
 
-a) Collect information from the user (not all at once — ask progressively):
-   - How do you address them? (nickname)
-   - Which platform? What's their ID? (QQ/WeChat/Bilibili/Luogu/CF...)
-   - What's their identity? (school/company/role)
-   - How did you meet? How long have you known each other?
-   - How close is the relationship?
-   - What topics can they help with?
-   - Any special notes or boundaries?
+a) 向用户收集信息（不要一口气全问——逐步追问）：
+   - 怎么称呼？（nickname）
+   - 哪个平台？ID 是什么？（QQ/微信/B站/洛谷/CF……）
+   - 身份？（学校/公司/角色）
+   - 怎么认识的？认识多久了？
+   - 关系有多近？
+   - 能帮上什么话题？
+   - 有什么特殊备注或边界？
 
-b) Create `contacts/{real-name}.md` (if real name unknown, use the commonly used nickname).
-   Fill in frontmatter using the template.
+b) 创建 `contacts/{真名}.md`（真名未知则用常用昵称）。
+   按模板布局填写（YAML 块 + 四个正文小节）。
 
-c) Update `INDEX.md`:
-   - Add a row to the Contact Overview table.
-   - Add rows to the tag navigation tables for any new tags.
+c) 更新 `INDEX.md`：
+   - 联系人总览表加一行。
+   - 涉及新标签的，在对应标签导航表加行。
 
-d) For any trigger tag that doesn't yet exist,
-   create the corresponding file in the correct `tags/` subdirectory.
+d) 对尚不存在的触发标签：按 2c 规则先向用户确认，
+   确认后再在正确的 `tags/` 子目录下创建对应文件。
 
-e) After adding, do a quick check: do all `[[wiki-links]]` point to existing files?
-   The only exception is template example text (like `[[tag-name]]`).
+e) 录入完成后快速检查：所有 `[[wiki-links]]` 都指向存在的文件吗？
+   唯一的例外是模板里的占位示例文本（如标签文件中的 `[[联系人姓名]]`）。
 
-### 2b. Conflict Resolution
+### 2b. 冲突处理
 
-Before creating any file, **always search INDEX.md first** to check whether this person
-already has an entry under a different name, alias, or platform ID.
+创建任何文件之前，**务必先搜 INDEX.md**，确认这个人是否已用别的
+名字、别名或平台 ID 存在。
 
-When conflicting information is found during search or update, **never guess**.
-Present the conflict to the user and ask before writing anything.
+在检索或更新过程中发现信息冲突时，**绝不猜测**。
+把冲突呈现给用户，得到答复后再写入。
 
-**Common conflict scenarios:**
+**常见冲突场景：**
 
-| Scenario | Action |
-|----------|--------|
-| Two entries with similar names (e.g. "张明" and "张小明") | Show both entries with their identity fields, ask if they are the same person |
-| Same person in two files (different platforms used to create them) | Show both, ask which to keep as canonical; merge by user direction |
-| Outdated identity (e.g. "大四" but the user knows they graduated) | Show current value and what the user just said, ask which to use |
-| Same trigger tag pointing to two different people with same name | Show both contacts, ask the user to disambiguate |
-| User contradicts their own previous entry | Show the old value, ask the user to confirm the update — don't silently overwrite |
+| 场景 | 动作 |
+|------|------|
+| 两个名字相似的条目（如"张明"和"张小明"） | 展示两条目及其 identity 字段，问是否同一人 |
+| 同一人有两个文件（用不同平台建的） | 都展示，问哪个作为主条目；按用户指示合并 |
+| 身份过期（如写着"大四"但用户知道已毕业） | 展示当前值和用户刚说的，问用哪个 |
+| 同一触发标签指向两个同名的人 | 展示两个联系人，请用户消歧 |
+| 用户否定自己之前的记录 | 展示旧值，请用户确认更新——不要静默覆盖 |
 
-**Rules:**
+**规则：**
 
-- **No silent overwrite**: if an existing field disagrees with new information, stop and ask.
-- **No silent merge**: never combine two entries automatically — the user must confirm.
-- **Ask before any merge, even if "probably the same"**: similarity is never grounds for merging on your own. Show the two entries side by side with the matching fields highlighted, ask the user to confirm they are the same person, and only merge after explicit approval. Treat as distinct contacts by default.
-- **Log the decision**: after the user resolves the conflict, add a brief note in the contact's `notes` field (e.g. "合并自 '张小明.md' — 2026-08-08") so the history is traceable.
+- **不静默覆盖**：已有字段与新信息矛盾时，停下来问。
+- **不静默合并**：绝不自动合并两个条目——必须用户确认。
+- **哪怕"八成是同一人"也要先问**：相似永远不是自行合并的理由。把两个条目并排展示、
+  高亮匹配字段，请用户确认是同一人，获得明确同意后才合并。默认按不同联系人处理。
+- **记录决策**：用户裁决后，在该联系人的 `## 备注` 小节加一句简短说明
+  （如"合并自 '张小明.md' — 2026-08-08"），保持历史可追溯。
 
-**How to ask (example dialogue):**
+**提问方式（示例对话）：**
 
 ```
 INDEX 中找到一个相似条目：
-  现有：张小明 — 姚班 2024 — [[Tsinghua University]] — QQ: 12345
+  现有：张小明 — 姚班 2024 — [[清华大学]] — QQ: 12345
   新信息：张明 — 清华 大四 — CS — QQ: 12345
 
 两个条目是否指向同一个人？
@@ -251,126 +263,151 @@ INDEX 中找到一个相似条目：
   3. 先不处理，我之后再确认
 ```
 
-### 2c. Tag Management — Ask Before Deciding
+### 2c. 标签管理——先问再定
 
-Any tag-related decision that has lasting structural impact on the vault must go through
-the user. **Do not create, merge, rename, or deprecate a tag on your own.**
+任何对 vault 有长期结构影响的标签决策都必须经过用户。
+**不要自行创建、合并、重命名或废弃标签。**
 
-When any of the following situations arise, stop and ask:
+出现以下任一情况时，停下来问：
 
-| Situation | What to ask the user |
-|-----------|---------------------|
-| Conversation introduces a concept with no matching tag (e.g. "大模型") | "Should I create a new tag `[[大模型]]` under `tags/field/`?" |
-| Two concepts could be the same or different (e.g. "AI" vs "大模型") | Show both candidates, ask whether they are distinct or should be merged |
-| A contact's `trigger_tags` references a tag that doesn't exist | "The tag `[[X]]` doesn't exist yet — create it, or remove it from this contact's tags?" |
-| A tag file exists but no contact references it | "The tag `[[X]]` has no contacts. Keep it, or move it to `.trash/`?" |
-| User suggests restructuring tags (e.g. renaming, splitting a layer) | Show the proposed change and its scope (which files, which contacts), ask for confirmation before proceeding |
+| 情况 | 问什么 |
+|------|--------|
+| 对话中出现无对应标签的概念（如"大模型"） | "要在 `tags/field/` 下新建标签 `[[大模型]]` 吗？" |
+| 两个概念可能相同也可能不同（如"AI"和"大模型"） | 展示两个候选，问是保留两个还是合并 |
+| 某联系人的触发标签指向不存在的标签 | "标签 `[[X]]` 还不存在——新建，还是从该联系人的标签里删掉？" |
+| 标签文件存在但没有任何联系人引用 | "标签 `[[X]]` 没有联系人。保留，还是移到 `.trash/`？" |
+| 用户提出标签重构（重命名、拆分某层等） | 展示变更方案及影响范围（哪些文件、哪些联系人），确认后再动手 |
 
-The general pattern: when in doubt, present the options and let the user choose.
+通用模式：拿不准就把选项摆出来让用户选。
 
-### 4. AI Associative Matching
+### 2d. 从聊天记录批量更新
 
-During conversation, when a trigger tag keyword appears:
-- Look up `INDEX.md` → match tags → list related contacts
-- Proactively remind: "On this topic, [Person] might be able to help."
-- When the user says "find someone to ask about X", use tags to match contacts.
+一个高频的真实场景：用户粘贴一段群聊记录，要求记录某些信息
+（如"记一下谁大学还打 ACM"）。可用的流程：
 
-### 5. Regular Maintenance
-- Update `last_contact` after each meaningful interaction.
-- Update `help_areas` and `trigger_tags` when discovering new capabilities or role changes.
-- **Sync INDEX.md**: whenever a contact's `trigger_tags`, `strength`, or `last_contact` changes, update their row in the Contact Overview table and the tag navigation tables in the same session.
-- Periodically audit the graph: run `scripts/audit_graph.py --report`, fix broken wiki-links, redundant tag-to-tag edges, and INDEX drift (see section 6).
+1. **先把每个昵称/发言人全库 grep 一遍**——`grep -rn "<名字>" contacts tags`。
+   很多人已用另一个 ID 存在（如线上 handle 对应真名）。
+2. **没匹配到的 handle 先收集，不要编造条目**。把已知事实写进相关标签文件的
+   临时表格，然后一次性问用户："这几个 handle 是谁？"给未知的人建占位联系人
+   比留一个临时表格更糟——会用无法连线的节点污染图谱。
+3. **两层都写**：个人文件记各自立场 + `last_contact`；
+   **领域标签文件放汇总表格**（人 | handle | 学校 | 立场 | 原话）。
+   群体快照应该放在标签页——话题出现时 AI 正是在那里查找，
+   比把每个人的立场分散到各自文件更好用。
+4. **同一轮同步 INDEX.md**：`last_contact`，并把 handle 写进身份列或
+   触发标签列，方便以后 grep 命中。
+5. **跑一遍 `scripts/audit_graph.py <vault_path> --report`**，确认没引入断链。
+6. **未解决项要显式汇报并提问**，绝不留一个"待补"静默了事。
 
-## Graph Hygiene Audit
+**引用用户原话时保留原始措辞**——逐字的句子（如"看到 4 学分瞬间热爱起来了"）
+承载着改写会销毁的动力和语气。
 
-When performing a full-audit (e.g., after batch imports or tag restructuring):
+### 4. AI 联想匹配
 
-### INDEX Consistency
+对话中出现触发标签的关键词时：
+- 查 `INDEX.md` → 匹配标签 → 列出相关联系人
+- 主动提醒："这个话题上，[某人] 可能帮得上。"
+- 用户说"找人问问 X"时，用标签匹配联系人。
 
-Before checking tag edges, verify that INDEX.md itself is consistent:
+### 5. 日常维护
+- 每次有意义的互动后更新 `last_contact`。
+- 发现新能力或角色变化时更新 `## 可帮事项` 和 `## 触发标签`。
+- **身份变动（换学校/公司/年级/城市）时**：更新 YAML 的 `identity`，
+  增删 `## 触发标签` 中对应层的标签（新标签按 2c 先确认再建），
+  处理旧标签是否废弃同样先问用户，最后在 INDEX 的总览表和标签导航表同步。
+- **同步 INDEX.md**：联系人的触发标签、强度或最近联系变化时，
+  同一轮会话里更新联系人总览表和标签导航表。
+- 定期审计图谱：跑 `scripts/audit_graph.py <vault_path> --report`，
+  修复断链、冗余标签边和 INDEX 漂移（见下节）。
 
-1. **Contact Overview completeness**: Every `.md` file in `contacts/` (excluding `.trash/`) must appear as a row in INDEX.md's Contact Overview table. No orphan contact files, no INDEX rows pointing to missing files.
+## 图谱卫生审计
 
-2. **Tag navigation completeness**: Every tag file that exists in `tags/{school,field,city}/` must appear in the corresponding table in INDEX.md. Every tag listed in a table must have a corresponding file.
+做全量审计时（如批量导入或标签重构之后）：
 
-3. **Wiki-links in INDEX**: All `[[wiki-links]]` in INDEX.md (tag file references, contact links) must resolve to existing files. Broken links indicate a renamed or deleted file that wasn't updated in INDEX.
+### INDEX 一致性
 
-### Automated Audit with `audit_graph.py`
+检查标签边之前，先确认 INDEX.md 自身是一致的：
 
-After verifying INDEX.md manually (steps 1–3 above), run the bundled script
-`scripts/audit_graph.py` to automate the remaining checks:
+1. **联系人总览完整性**：`contacts/` 下每个 `.md` 文件（不含 `.trash/`）
+   必须在 INDEX.md 的联系人总览表里有一行。不允许有孤儿联系人文件，
+   也不允许 INDEX 行指向不存在的文件。
+
+2. **标签导航完整性**：`tags/{school,field,city}/` 下每个标签文件必须出现在
+   INDEX.md 对应的表格里。表格中列出的每个标签都必须有对应文件。
+
+3. **INDEX 中的 wiki-links**：INDEX.md 里所有 `[[wiki-links]]`
+   （标签引用、联系人链接）都必须能解析到存在的文件。断链意味着
+   有文件被改名或删除而 INDEX 未同步。
+
+### 用 `audit_graph.py` 自动审计
+
+手工完成上面 1–3 步后，运行自带脚本 `scripts/audit_graph.py` 自动完成剩余检查：
 
 ```bash
-python scripts/audit_graph.py <vault_path>            # summary to stdout
-python scripts/audit_graph.py <vault_path> --report   # full human-readable report
-python scripts/audit_graph.py <vault_path> --json     # machine-readable JSON
+python scripts/audit_graph.py <vault_path>            # 概要输出
+python scripts/audit_graph.py <vault_path> --report   # 完整人类可读报告
+python scripts/audit_graph.py <vault_path> --json     # 机器可读 JSON
 ```
 
-The script checks:
+脚本检查：
 
-4. **Contact ↔ Tag**: Every `trigger_tag` in every contact file must point to an
-   actually existing tag file. The script reports any broken links.
+4. **联系人 ↔ 标签**：每个联系人的每个触发标签必须指向真实存在的标签文件。
+   脚本会报告断链。
 
-5. **School ↔ City**: Allowed (structural edge — location relationship).
+5. **学校 ↔ 城市**：允许（结构性边——地理位置关系）。
 
-6. **City ↔ City**: Only same-region or adjacent cities allowed (e.g. Nanjing ↔ Shanghai).
+6. **城市 ↔ 城市**：仅同区域或相邻城市允许（如 南京 ↔ 上海）。
 
-7. **Field ↔ Field**: Only same-system domains allowed (e.g. OI ↔ ICPC, EE ↔ CS).
-   Random links like "Medicine ↔ Finance" should be removed.
+7. **方向 ↔ 方向**：仅同体系领域允许（如 OI ↔ ICPC、EE ↔ CS）。
+   "医学 ↔ 金融"这类随意链接应删除。
 
-8. **All other cross-edges**: Should be deleted. If two tags are connected only through
-   shared contacts, that edge is useless — the contact node IS the natural bridge.
+8. **其他所有跨边**：应删除。若两个标签仅通过共享联系人相连,
+   这条边毫无价值——联系人节点才是天然的桥梁。
 
-The script also reports orphan contacts (no tags), orphan tags (no contacts),
-tag usage rankings, and redundant tag-to-tag edges for manual review.
+脚本还会报告：孤儿联系人（无标签）、孤儿标签（无联系人）、
+标签使用排行、冗余标签边（供人工复核）。
 
-### Audit Execution
+### 审计执行流程
 
-1. Verify INDEX.md is in sync manually (see INDEX Consistency above).
-2. Run `python scripts/audit_graph.py <vault_path> --report` to generate the full report.
-3. Review the report:
-   - Fix any broken wiki-links.
-   - Remove redundant tag-to-tag edges (contact-bridged only).
-   - Address orphan contacts (add tags) or orphan tags (deprecate or link them).
-4. Re-run the script to confirm all issues are resolved.
+1. 先手工核对 INDEX.md 已同步（见上文 INDEX 一致性）。
+2. 运行 `python scripts/audit_graph.py <vault_path> --report` 生成完整报告。
+3. 审阅报告：
+   - 修复所有断链。
+   - 删除冗余标签边（仅联系人桥接的）。
+   - 处理孤儿联系人（补标签）或孤儿标签（废弃或连线）。
+4. 重跑脚本确认全部问题解决。
 
-### Removing or Archiving a Contact
+### 删除或归档联系人
 
-When a contact is no longer relevant (e.g. lost touch, duplicate entry):
+当某联系人不再相关（失去联系、重复条目等）：
 
-1. **Move the file to `.trash/`**: `mv contacts/{name}.md vault-root/.trash/`. Never use `rm`.
-2. **Update INDEX.md Contact Overview**: Remove or strike-through that row. Add a note like "Archived 2026-08-08 — moved to `.trash/`" so the history is visible.
-3. **Update tag navigation tables**: If this person was the *only* contact under a tag, consider whether the tag itself should be deprecated (move tag file to `.trash/` too, after confirming no other contacts reference it).
-4. **Do NOT remove shared-friends wiki-links**: Even archived contacts leave traces. The `notes` field in other contacts may still reference them via `[[wiki-links]]`.
+1. **把文件移到 `.trash/`**：`mv contacts/{name}.md vault-root/.trash/`。绝不 `rm`。
+2. **更新 INDEX.md 联系人总览**：删除该行或加删除线，并留一句
+   "Archived 2026-08-08 — 已移入 `.trash/`"，让历史可见。
+3. **更新标签导航表**：若此人是某标签下唯一联系人，考虑该标签是否也应废弃
+   （确认无其他联系人引用后，标签文件同样移入 `.trash/`）。
+4. **不要删除共同好友的 wiki-links**：即便联系人已归档，痕迹仍应保留。
+   其他联系人的 `## 备注` 小节可能仍通过 `[[wiki-links]]` 引用他们。
 
-### Moving Legacy Files
-When restructuring (e.g. changing tag naming conventions), do NOT use `rm` for removal.
-Instead: `mv old-file.md vault-root/.trash/`. Obsidian auto-ignores `.trash/`.
-This avoids OS-level trash issues (especially on Windows where paths with Chinese
-characters can break `trash` CLI tools).
+### 移动历史文件
 
-## Scripts
+重构时（如更改标签命名规范），删除不要用 `rm`。
+改为：`mv old-file.md vault-root/.trash/`。Obsidian 会自动忽略 `.trash/`。
+这样可避开 OS 级回收站问题（尤其在 Windows 上，含中文的路径常让
+`trash` 命令行工具失效）。
 
-- `scripts/audit_graph.py` — Automated graph integrity checker. Scans the vault for broken wiki-links, orphan contacts/tags, redundant tag-to-tag edges, and generates a human-readable report or JSON output. Run after any batch import or tag restructuring.
+## 脚本
 
-## Template Resources
+- `scripts/audit_graph.py` — 图谱完整性自动检查器。扫描 vault 中的断链、
+  孤儿联系人/标签、冗余标签边，输出人类可读报告或 JSON。每次批量导入或
+  标签重构后运行。
+  **依赖 `pyyaml`**，裸解释器通常没有——请装在虚拟环境里，不要装进系统解释器。
+  技巧：报告很长（统计 → 圈层 → 结构边 → 冗余边 → 最后才是完整性问题），
+  用 `head -80` / `tail -45` 分段查看。
 
-- `assets/contact-template.md` — Frontmatter + body template for new contact entries.
-  Copy to `templates/contact.md` during vault initialization.
-- `assets/INDEX-template.md` — Full INDEX.md skeleton with empty tables.
-  Copy to `INDEX.md` during vault initialization, then fill in as contacts are added.
-- `assets/onboarding-example.md` — Complete walkthrough of vault initialization +
-  first contact entry, with expected output at each step. Read this when setting up
-  a new vault for the first time.
+## 模板资源
 
-## Quick Reference
-
-| Action | Steps |
-|--------|-------|
-| First-time setup | Follow `assets/onboarding-example.md` step by step |
-| New contact | Collect info → search INDEX for duplicates → create `contacts/{name}.md` → update INDEX → create tags if needed |
-| Who to ask about X? | Search INDEX for trigger tag → list matching contacts |
-| After talking to someone | Update `last_contact` in their file |
-| Person changed schools/jobs | Update `identity` + `trigger_tags` → update INDEX → add/remove tag files as needed |
-| Remove / archive contact | Move file to `.trash/` → remove INDEX row → deprecate orphan tags if needed |
-| Full audit | Run `scripts/audit_graph.py --report` → fix issues → re-run to confirm |
+- `assets/contact-template.md` — 新建联系人的布局模板（正文 YAML 块 + 四个小节）。
+  vault 初始化时复制为 `templates/contact.md`。
+- `assets/INDEX-template.md` — 带空表格的 INDEX.md 骨架。
+- `assets/onboarding-example.md` — 从零初始化 vault 并录入第一个联系人的完整示例。

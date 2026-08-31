@@ -1,45 +1,45 @@
 ---
-title: Contact Index
+title: 人脉索引
 type: index
 ---
 
-# Contact Index
+# 人脉索引
 
-> Quick-reference table: nickname | identity | trigger tags | strength | last contact | link
-> AI should read this file first for associative matching.
-> See individual contact files in `contacts/` for full details.
+> 速查表：昵称 | 身份 | 触发标签 | 强度 | 最近联系 | 链接
+> AI 做联想匹配时优先读本文件。
+> 完整信息见 `contacts/` 下的个人文件。
 
-## Contact Overview
+## 联系人总览
 
-| Nickname | Identity | Trigger Tags | Strength | Last Contact | Link |
-|----------|----------|-------------|----------|-------------|------|
-| <!-- Add rows as contacts are created --> | | | | | |
+| 昵称 | 身份 | 触发标签 | 强度 | 最近联系 | 链接 |
+|------|------|----------|------|----------|------|
+| <!-- 随联系人录入逐行添加 --> | | | | | |
 
-## Search by Tag
+## 按标签检索
 
 <!--
-  Tags are organized in three atomic layers:
-  - School tags in tags/school/
-  - Field/domain tags in tags/field/
-  - City tags in tags/city/
-  Never create combo tags (e.g. "Peking University Math").
-  Contact nodes are the bridges between different tag dimensions.
+  标签分三层原子目录：
+  - 学校标签在 tags/school/
+  - 方向/领域标签在 tags/field/
+  - 城市标签在 tags/city/
+  绝不创建组合标签（如 "北京大学数学"）。
+  联系人节点才是不同标签维度之间的桥梁。
 -->
 
-### Schools
+### 学校
 
-| Tag | When to Trigger | Tag File |
-|-----|----------------|----------|
-| <!-- e.g. Peking University --> | <!-- e.g. Yanyuan campus, guaranteed admission --> | <!-- [[Peking University]] --> |
+| 标签 | 触发场景 | 标签文件 |
+|------|----------|----------|
+| <!-- 如 北京大学 --> | <!-- 如 燕园、保送 --> | <!-- [[北京大学]] --> |
 
-### Fields
+### 专业方向
 
-| Tag | When to Trigger | Tag File |
-|-----|----------------|----------|
-| <!-- e.g. OI Competition --> | <!-- e.g. NOIP, CSP, NOI, training --> | <!-- [[OI Competition]] --> |
+| 标签 | 触发场景 | 标签文件 |
+|------|----------|----------|
+| <!-- 如 OI 信息竞赛 --> | <!-- 如 NOIP、CSP、NOI --> | <!-- [[OI 信息竞赛]] --> |
 
-### Cities
+### 城市
 
-| Tag | When to Trigger | Tag File |
-|-----|----------------|----------|
-| <!-- e.g. Beijing --> | <!-- e.g. meetups, campus visits, Beijing-based contacts --> | <!-- [[Beijing]] --> |
+| 标签 | 触发场景 | 标签文件 |
+|------|----------|----------|
+| <!-- 如 北京 --> | <!-- 如 面基、约饭 --> | <!-- [[北京]] --> |

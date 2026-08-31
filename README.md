@@ -8,7 +8,7 @@
 
 在 Claude Code 中直接说：
 
-- "帮我建一个关系图谱 vault，放在 `D:/people/`"
+- "帮我建一个关系图谱 vault，放在 `~/people/`"
 - "记一下这个人：xxx"
 - "谁可以帮我搞 xxx？"
 
@@ -43,7 +43,7 @@ vault-root/
 
 - `SKILL.md` — 完整 skill 定义（初始化流程、录入、审计、冲突处理、标签管理）
 - `assets/onboarding-example.md` — 从零初始化 + 第一个联系人录入的完整示例
-- `assets/contact-template.md` — 联系人文件 frontmatter 模板
+- `assets/contact-template.md` — 联系人布局模板（正文 YAML 块 + 四个小节）
 - `assets/INDEX-template.md` — INDEX.md 骨架模板
 - `scripts/audit_graph.py` — 图谱完整性审计脚本（断链、孤立节点、冗余边）
 

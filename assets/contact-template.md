@@ -3,42 +3,38 @@ title: Contact Template
 type: template
 ---
 
-# {{Name}}
+# {{姓名}}
 
 ```yaml
-nickname: ""          # How you address this person (alias/real name/nickname — used as primary key)
-real_name: ""         # Legal name (optional; leave empty if nickname is already the real name)
-platforms:            # Platform IDs — at least one required
+nickname: ""          # 怎么称呼这个人（别名/真名/昵称——作为主键）
+real_name: ""         # 法定姓名（可选；昵称即真名时留空）
+platforms:            # 平台 ID——至少填一个
   qq: ""
   wechat: ""
   bilibili: ""
   luogu: ""
   codeforces: ""
   other: ""
-identity: ""          # One-line description: school/year/major/role (e.g. "CS sophomore at X University")
-context: ""           # How/where did you meet? (e.g. group chat, competition, summer camp, friend intro)
-strength: ""          # Relationship strength: close / acquaintance / casual / not-close→expected-to-grow
-last_contact: ""      # Last meaningful interaction: YYYY-MM-DD
-help_areas:           # What they can help with (e.g. ["ICPC team formation", "internship referral"])
-  - ""
-trigger_tags:         # Topics that should trigger recalling this person
-  - ""
-notes: ""             # Personality, boundaries, shared friends (use [[wiki-links]] for other contacts)
----
+identity: ""          # 一句话身份：学校/年级/专业/角色（如 "北京大学 计算机 2026 级")
+context: ""           # 怎么/在哪认识的？（群聊、比赛、夏令营、朋友介绍……）
+strength: ""          # 关系强度：close（密友）/ acquaintance（熟识）/ casual（泛泛）/ not-close→expected-to-grow（不熟但预期会升温）
+last_contact: ""      # 最近一次有意义互动的日期：YYYY-MM-DD
 ```
 
-## Help Areas (Core for AI Association)
+## 可帮事项（AI 联想的核心）
 
-<!-- What is this person good at? Which lab/company/school? What information can they provide? Write clearly. -->
+<!-- 这个人擅长什么？在哪个学校/公司/实验室？能提供什么信息？写清楚。 -->
 
-## Trigger Tags
+## 触发标签
 
-<!-- What topics should trigger recalling this person? e.g. CPC training, internship referral, city meetup -->
+<!-- 什么话题应该触发想起这个人？用 Obsidian 双链语法包裹标签名，
+     指向对应标签文件（如 北京大学、OI 信息竞赛 两个标签）。
+     注意：不要把注释里的示例原样保留，也不要用不带双链的纯文本列标签。 -->
 
-## Interaction History
+## 历史互动
 
-<!-- What they helped with / what you helped them with / key conversation events -->
+<!-- 他帮过什么 / 你帮过什么 / 关键对话事件（最新的写在最后） -->
 
-## Notes
+## 备注
 
-<!-- Personality, hobbies, mutual friends (use [[wiki-links]]), relationship boundaries (e.g. "only ask simple questions, do not owe favors") -->
+<!-- 性格、爱好、共同好友（用双链连接）、关系边界（如 "只问简单问题，不欠人情"） -->

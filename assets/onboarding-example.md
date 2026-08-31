@@ -10,7 +10,7 @@
 用户说想建一个关系图谱。确认 vault 放在独立目录：
 
 ```
-D:/people/
+~/people/
 ```
 
 不放在已有 Obsidian vault 里，因为联系人数据含敏感信息（平台 ID、个人背景）。
@@ -18,13 +18,13 @@ D:/people/
 ## 步骤 2: 创建目录结构
 
 ```bash
-mkdir -p D:/people/{contacts,templates,tags/{school,field,city}}
+mkdir -p ~/people/{contacts,templates,tags/{school,field,city}}
 ```
 
 ## 步骤 3: 复制模板
 
 ```bash
-cp assets/contact-template.md D:/people/templates/contact.md
+cp assets/contact-template.md ~/people/templates/contact.md
 ```
 
 ## 步骤 4: 创建 README.md
@@ -62,7 +62,7 @@ type: index
 
 # 人脉索引
 
-> 速查表：昵称 | 身份 | 触发标签 | 关系强度 | 最近联系
+> 速查表：昵称 | 身份 | 触发标签 | 强度 | 最近联系 | 链接
 > AI 优先读本文件做联想匹配；详情进对应联系人文件。
 
 ## 联系人总览
@@ -75,19 +75,19 @@ type: index
 
 ### 学校
 
-| 学校 | 触发场景 | 标签文件 |
+| 标签 | 触发场景 | 标签文件 |
 | --- | --- | --- |
 | | | |
 
 ### 专业方向
 
-| 方向 | 触发场景 | 标签文件 |
+| 标签 | 触发场景 | 标签文件 |
 | --- | --- | --- |
 | | | |
 
 ### 城市
 
-| 城市 | 触发场景 | 标签文件 |
+| 标签 | 触发场景 | 标签文件 |
 | --- | --- | --- |
 | | | |
 ```
@@ -95,7 +95,7 @@ type: index
 ## 步骤 6: 创建 .trash/ 目录
 
 ```bash
-mkdir -p D:/people/.trash
+mkdir -p ~/people/.trash
 ```
 
 ---
@@ -115,7 +115,7 @@ INDEX 是空的，无重复。
 - 哪个学校？→ 北京大学
 - 专业/年级？→ 计算机 2026 级
 - 怎么认识的？→ 高中同班
-- 关系有多近？→ 高中好友
+- 关系有多近？→ 高中好友（close）
 - 能帮什么？→ 北大校园信息、算法交流
 - 触发标签？→ 北京大学、OI 信息竞赛、北京
 
@@ -133,18 +133,18 @@ type: contact
 
 ```yaml
 nickname: "陈默"
-real_name: "陈默"
-platform:
+real_name: ""
+platforms:
   qq: "12345"
   luogu: ""
   other: ""
 identity: "北京大学 计算机 2026 级 · 高中同班"
-met: "高中同班同学"
-strength: "高中好友"
+context: "高中同班同学"
+strength: close
 last_contact: ""
 ```
 
-## 可帮事项
+## 可帮事项（AI 联想的核心）
 
 - 北大校园信息（计算机系）
 - 算法交流
@@ -222,7 +222,7 @@ type: tag
 在"联系人总览"表加一行：
 
 ```markdown
-| 陈默 | 北京大学 计算机 2026 · 高中同班 | [[北京大学]] [[OI 信息竞赛]] [[北京]] | 高中好友 | — | [[陈默]] |
+| 陈默 | 北京大学 计算机 2026 · 高中同班 | [[北京大学]] [[OI 信息竞赛]] [[北京]] | close | — | [[陈默]] |
 ```
 
 在三个 tag 子表各加一行：
@@ -257,7 +257,7 @@ type: tag
 ## 初始化完成后的目录
 
 ```
-D:/people/
+~/people/
 ├── README.md
 ├── INDEX.md
 ├── .trash/
