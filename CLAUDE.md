@@ -1,97 +1,108 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本文件为 Claude Code (claude.ai/code) 在本仓库中工作时提供指引。
 
-## What This Is
+## 这是什么
 
-This is a **Claude Code skill** (not a software project). It defines a methodology for building a personal relationship graph — an AI-readable, structured knowledge base stored as an Obsidian vault. The skill tells Claude how to help users manage contacts, organize them with a three-layer atomic tag system, and proactively suggest who can help when a topic arises in conversation.
+这是一个 **Claude Code skill**（不是软件项目）。它定义了构建个人关系图谱的方法论——
+一个人机可读、结构化的知识库，以 Obsidian vault 形式存放。本 skill 告诉 Claude
+如何帮用户管理联系人、用三层原子标签体系组织他们，并在对话话题出现时主动推荐可以求助的人。
 
-## Repository Layout
+## 仓库结构
 
 ```
 relationship-graph/
-├── CLAUDE.md              # This file — guidance for Claude Code
-├── SKILL.md               # Full skill definition (the authoritative source)
+├── CLAUDE.md              # 本文件——Claude Code 工作指引
+├── SKILL.md               # 完整 skill 定义（权威来源）
 └── assets/
-    ├── contact-template.md # Frontmatter + body template for new contact entries
-    └── INDEX-template.md   # INDEX.md skeleton with empty tables
+    ├── contact-template.md # 联系人布局模板（正文 YAML 块 + 四个小节）
+    └── INDEX-template.md   # 带空表格的 INDEX.md 骨架
 ```
 
-## Core Concepts
+## 核心概念
 
-**Three-layer atomic tags**: School, Field, and City tags live in separate `tags/{school,field,city}/` subdirectories. Tags are standalone `.md` files connected via Obsidian wiki-links. Never create combo tags (e.g. "Peking University Math") — the contact node itself bridges dimensions.
+**三层原子标签**：学校、方向、城市标签分别存放在 `tags/{school,field,city}/` 三个子目录。
+标签是独立的 `.md` 文件，通过 Obsidian wiki-link 连接。绝不创建组合标签
+（如"北大数学"）——联系人节点本身就是跨维度的桥梁。
 
-**Vault isolation**: Contact data contains sensitive info (platform IDs, personal background). It must live in an independent vault directory, never mixed with public blogs or daily notes.
+**Vault 隔离**：联系人数据含敏感信息（平台 ID、个人背景），必须存放在独立 vault 目录，
+不与公开博客或日常笔记混放。
 
-**Trigger-driven recall**: Tags act as triggers. When a conversation topic matches a tag, Claude should look up `INDEX.md` and proactively surface relevant contacts.
+**触发式召回**：标签即触发器。对话话题命中标签时，Claude 应查 `INDEX.md`，
+主动呈现相关联系人。
 
-## Vault Structure
+## Vault 结构
 
 ```
 vault-root/
-├── README.md              # Usage conventions and design notes
-├── INDEX.md               # Quick-reference index + tag navigation (read first for matching)
-├── contacts/              # One .md file per person
+├── README.md              # 使用约定与设计决策
+├── INDEX.md               # 速查索引 + 标签导航（优先读取以做匹配）
+├── contacts/              # 每人一个 .md 文件
 ├── templates/
-│   └── contact.md         # Copied from assets/contact-template.md
+│   └── contact.md         # 从 assets/contact-template.md 复制
 └── tags/
-    ├── school/            # One file per school
-    ├── field/             # One file per domain (e.g. OI Competition)
-    └── city/              # One file per city
+    ├── school/            # 每个学校一个文件
+    ├── field/             # 每个领域一个文件（如 OI 信息竞赛）
+    └── city/              # 每个城市一个文件
 ```
 
-## Frontmatter Schema (contacts/*.md)
+## 联系人文件字段（contacts/*.md）
 
-Every contact file uses YAML frontmatter with these keys:
+YAML 块放在**正文内**（```yaml 围栏），不是 Obsidian frontmatter。
+权威来源是 `assets/contact-template.md`。活体 vault 可能本地化字段名——
+写入前先读该 vault 的 `templates/contact.md` 和一个已有联系人文件。
+YAML 只含以下键：
 
-| Key | Type | Description |
-|-----|------|-------------|
-| `nickname` | string | How the person is addressed (primary key) |
-| `real_name` | string | Legal name (optional) |
-| `platforms` | object | Platform IDs: `qq`, `wechat`, `bilibili`, `luogu`, `codeforces`, `other` |
-| `identity` | string | One-line identity (school/year/major/role) |
-| `context` | string | How/where you met |
-| `strength` | string | Relationship strength: close / acquaintance / casual / not-close→expected-to-grow |
-| `last_contact` | string | Date of last meaningful interaction (YYYY-MM-DD) |
-| `help_areas` | list of strings | What they can help with |
-| `trigger_tags` | list of strings | Wiki-link tags that trigger recalling this person |
-| `notes` | string | Personality, boundaries, mutual friends |
+| 键 | 类型 | 说明 |
+|-----|------|------|
+| `nickname` | string | 怎么称呼（主键） |
+| `real_name` | string | 法定姓名（可选） |
+| `platforms` | object | 平台 ID：`qq`、`wechat`、`bilibili`、`luogu`、`codeforces`、`other` |
+| `identity` | string | 一句话身份（学校/年级/专业/角色） |
+| `context` | string | 怎么认识的 |
+| `strength` | string | 关系强度枚举：close / acquaintance / casual / not-close→expected-to-grow |
+| `last_contact` | string | 最近一次有意义互动（YYYY-MM-DD） |
 
-## Key Design Rules
+`help_areas`、`trigger_tags`、`notes` 不是 YAML 字段，而是四个正文小节：
+`## 可帮事项（AI 联想的核心）`、`## 触发标签`、`## 历史互动`、`## 备注`。
 
-1. **Independent vault**: Never place contact files inside a vault shared with public or work notes. Use a dedicated directory (e.g. `~/people/`).
-2. **Atomic tags only**: School, field, and city are three independent layers. The contact node is the bridge.
-3. **Real names for filenames**: File names use real names. Aliases go in the `nickname` field.
-4. **Graph hygiene**: When two tags are connected only through shared contacts, delete that tag-to-tag edge — the contact node is the natural bridge.
-5. **Safe deletion**: Use `mv` to `.trash/` for restructuring, never `rm`. Obsidian auto-ignores `.trash/`.
+## 关键设计规则
 
-## Workflows
+1. **独立 vault**：联系人文件绝不放进与公开/工作笔记共享的 vault，用专门目录（如 `~/people/`）。
+2. **只用原子标签**：学校、方向、城市是三个独立层，联系人节点是桥梁。
+3. **真名做文件名**：文件名用真名，别名放进 `nickname` 字段。
+4. **图谱卫生**：两个标签若仅因共享联系人相连，删掉这条标签间边——联系人节点是天然桥梁。
+5. **安全删除**：重构用 `mv` 到 `.trash/`，绝不用 `rm`。Obsidian 自动忽略 `.trash/`。
 
-### Initialize a Vault
-1. Create directory: `mkdir -p vault-root/{contacts,templates,tags/{school,field,city}}`
-2. Copy `assets/contact-template.md` → `vault-root/templates/contact.md`
-3. Copy `assets/INDEX-template.md` → `vault-root/INDEX.md`
-4. Create `README.md` with design decisions and usage conventions
-5. Create `.trash/` directory for safe archiving
+## 工作流
 
-### Add a New Contact
-1. Collect info progressively (don't ask for everything at once).
-2. Create `contacts/{real-name}.md` with frontmatter from the template.
-3. Update `INDEX.md` — add row to Contact Overview table, and tag navigation tables for any new tags.
-4. Create tag files in the correct `tags/{layer}/` subdirectory for any new tags.
-5. Verify all `[[wiki-links]]` in trigger_tags resolve to existing files.
+### 初始化 vault
+1. 建目录：`mkdir -p vault-root/{contacts,templates,tags/{school,field,city}}`
+2. 复制 `assets/contact-template.md` → `vault-root/templates/contact.md`
+3. 复制 `assets/INDEX-template.md` → `vault-root/INDEX.md`
+4. 创建 `README.md`，写明设计决策和使用约定
+5. 创建 `.trash/` 目录用于安全归档
 
-### AI Associative Matching
-When a conversation topic appears, search `INDEX.md` for matching trigger tags and proactively suggest relevant contacts. Never create combo tags during matching.
+### 录入新联系人
+1. 逐步收集信息（不要一口气全问）。
+2. 按模板布局创建 `contacts/{真名}.md`（正文 YAML 块 + 四个小节）。
+3. 更新 `INDEX.md`——联系人总览表加行，涉及新标签的在标签导航表加行。
+4. 遇到尚不存在的触发标签：先按 SKILL.md 2c 向用户确认，确认后在正确的 `tags/{层}/` 子目录下建文件。
+5. 确认 `## 触发标签` 小节里所有 `[[wiki-links]]` 都能解析到存在的文件。
 
-## Audit Checklist
+### AI 联想匹配
+对话话题出现时，搜 `INDEX.md` 匹配触发标签，主动推荐相关联系人。
+匹配过程中绝不创建组合标签。
 
-- Every `trigger_tag` in every contact file points to an existing tag file.
-- School ↔ City edges are allowed (structural).
-- City ↔ City edges only for same-region/adjacent cities.
-- Field ↔ Field edges only for same-system domains (e.g. OI ↔ ICPC).
-- Delete all other cross-edges — contact nodes are the bridges.
+## 审计清单
 
-## Reference
+- 每个联系人里的每个触发标签都指向存在的标签文件。
+- 学校 ↔ 城市边允许（结构性）。
+- 城市 ↔ 城市边仅限同区域/相邻城市。
+- 方向 ↔ 方向边仅限同体系领域（如 OI ↔ ICPC）。
+- 删除其他所有跨边——联系人节点是桥梁。
 
-The full skill specification (including rationale, frontmatter examples, INDEX structure, and tag file template) is in `SKILL.md`. The templates in `assets/` are the canonical forms to copy during vault initialization.
+## 参考
+
+完整 skill 规范（含设计缘由、联系人布局、INDEX 结构、标签文件模板）见 `SKILL.md`。
+`assets/` 下的模板是 vault 初始化时复制的标准形态。

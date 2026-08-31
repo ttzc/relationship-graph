@@ -6,7 +6,7 @@
 
 核心功能：
   1. 解析 Markdown 文件中的 [[wiki-links]] 双向链接
-  2. 提取 YAML frontmatter 中的结构化字段
+  2. 提取 YAML frontmatter 与正文 ```yaml 围栏块中的结构化字段
   3. 构建图结构（联系人 ↔ 标签 的多层网络）
   4. 检测断链、孤立节点
   5. 识别"仅共享联系人而相关的冗余标签边"
@@ -24,6 +24,11 @@ import yaml
 from pathlib import Path
 from collections import defaultdict
 from typing import Dict, List, Set, Tuple, Optional
+
+# Windows 下重定向/管道到文件时 stdout 默认用 cp936，emoji 会直接抛
+# UnicodeEncodeError——统一切到 UTF-8，非法字符降级替换
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 
 # ─── 第 1 部分：Wiki-Link 解析器 ───────────────────────────────────────────
@@ -70,6 +75,24 @@ def parse_frontmatter(text: str) -> dict:
         return {}
 
 
+def parse_yaml_blocks(text: str) -> dict:
+    """
+    提取 Markdown 正文中 ```yaml 围栏块里的 YAML，合并为一个 dict。
+
+    联系人模板把结构化字段放在正文围栏块里（而非 frontmatter），
+    见 assets/contact-template.md。解析失败返回 {}。
+    """
+    merged = {}
+    for block in re.findall(r"^```yaml\s*\n(.*?)\n```", text, re.DOTALL | re.MULTILINE):
+        try:
+            data = yaml.safe_load(block)
+            if isinstance(data, dict):
+                merged.update(data)
+        except yaml.YAMLError:
+            pass
+    return merged
+
+
 # ─── 第 2 部分：文件扫描器 ─────────────────────────────────────────────────
 
 def scan_vault(vault_path: str) -> Tuple[Dict[str, dict], Dict[str, dict]]:
@@ -93,6 +116,7 @@ def scan_vault(vault_path: str) -> Tuple[Dict[str, dict], Dict[str, dict]]:
             name = md_file.stem  # 文件名即联系人名
             contacts[name] = {
                 "frontmatter": fm,
+                "yaml_body": parse_yaml_blocks(text),
                 "wiki_links": links,
                 "file_path": str(md_file),
             }
@@ -111,6 +135,7 @@ def scan_vault(vault_path: str) -> Tuple[Dict[str, dict], Dict[str, dict]]:
             tag_type = rel.parts[0] if len(rel.parts) > 1 else "root"
             tags[name] = {
                 "frontmatter": fm,
+                "yaml_body": parse_yaml_blocks(text),
                 "wiki_links": links,
                 "type": tag_type,
                 "linked_contacts": [],
@@ -144,8 +169,13 @@ def build_graph(contacts: dict, tags: dict) -> dict:
     # Step 1: 建立联系人→标签的映射
     contact_to_tags: Dict[str, Set[str]] = {}
     for name, data in contacts.items():
-        # 从 frontmatter 的 trigger_tags 字段拿标签
-        raw_tags = data["frontmatter"].get("trigger_tags", [])
+        # 从 trigger_tags 字段拿标签（frontmatter 或正文 ```yaml 围栏块，若存在；
+        # 模板约定该字段主要在正文的 ## 触发标签 小节中以双链形式出现）
+        raw_tags = (
+            data["frontmatter"].get("trigger_tags")
+            or data.get("yaml_body", {}).get("trigger_tags")
+            or []
+        )
         tag_set = set()
         for t in raw_tags:
             # 可能是纯字符串 或 [[string]]
@@ -225,7 +255,8 @@ def audit_integrity(contacts: dict, tags: dict, graph: dict) -> List[str]:
         for link in data["wiki_links"]:
             if link not in all_valid_targets:
                 # 忽略模板示例中的特殊链接
-                if link in ("双链", "tag-name", "双链示例"):
+                if link in ("双链", "tag-name", "双链示例",
+                            "联系人姓名", "标签名", "wiki-links"):
                     continue
                 issues.append(
                     f"[断链] 联系人 '{name}' 中的 [[{link}]] 找不到对应文件"
@@ -235,7 +266,8 @@ def audit_integrity(contacts: dict, tags: dict, graph: dict) -> List[str]:
     for tag_name, tag_data in tags.items():
         for link in tag_data["wiki_links"]:
             if link not in all_valid_targets:
-                if link in ("双链", "tag-name", "双链示例"):
+                if link in ("双链", "tag-name", "双链示例",
+                            "联系人姓名", "标签名", "wiki-links"):
                     continue
                 issues.append(
                     f"[断链] 标签 '{tag_name}' 中的 [[{link}]] 找不到对应文件"
@@ -384,10 +416,10 @@ def generate_report(
 def main():
     if len(sys.argv) < 2:
         print("用法: python audit_graph.py <vault_path> [--report] [--json]")
-        print("示例: python audit_graph.py D:/people --report")
+        print("示例: python audit_graph.py ~/people --report")
         sys.exit(1)
 
-    vault_path = sys.argv[1]
+    vault_path = os.path.expanduser(sys.argv[1])
     show_report = "--report" in sys.argv
     output_json = "--json" in sys.argv
 
