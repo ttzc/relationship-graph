@@ -18,13 +18,14 @@
 ## 步骤 2: 创建目录结构
 
 ```bash
-mkdir -p ~/people/{contacts,templates,tags/{school,field,city}}
+mkdir -p ~/people/{contacts,rosters,templates,tags/{school,field,city}}
 ```
 
 ## 步骤 3: 复制模板
 
 ```bash
 cp assets/contact-template.md ~/people/templates/contact.md
+cp assets/roster-template.md ~/people/templates/roster.md
 ```
 
 ## 步骤 4: 创建 README.md
@@ -70,6 +71,12 @@ type: index
 | 昵称 | 身份 | 触发标签 | 强度 | 最近联系 | 链接 |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
+
+## 名单
+
+| 名单 | 触发场景 | 已登记/仅名单 | 链接 |
+| --- | --- | --- | --- |
+| | | | |
 
 ## 按标签检索
 
@@ -254,6 +261,54 @@ type: tag
 
 ---
 
+## 录入一份名单
+
+假设用户说："记一下全班名单，班长陈默，副班长李明，还有王芳。"
+
+### 7a. 创建名单文件
+
+复制 `templates/roster.md` → `rosters/班级-2026.md`：
+
+```markdown
+---
+title: 班级-2026
+type: roster
+---
+
+# 班级-2026
+
+**触发场景**：NOIP、CSP、班级事务
+
+## 成员
+
+| 姓名 | 角色 | 状态 |
+| --- | --- | --- |
+| [[陈默]] | 班长 | 已登记 |
+| 李明 | 副班长 | 仅名单 |
+| 王芳 | 队员 | 仅名单 |
+```
+
+- 陈默 已在人脉库 → 姓名列用 `[[双链]]` 直达 `contacts/陈默.md`
+- 李明、王芳 只有这个公共名单 → 纯文本名字 + 角色，不建联系人文件
+
+### 7b. 更新 INDEX.md「名单」导航区
+
+```markdown
+| 班级-2026 | NOIP、CSP、班级事务 | 1 + 2 | [[班级-2026]] |
+```
+
+### 7c. 升级路径（示例）
+
+过段时间王芳熟络了，用户说"记一下王芳"。此时：
+1. 按 6a–6f 流程建 `contacts/王芳.md`；
+2. 把名单行改成 `[[王芳]] | 队员 | 已登记`；
+3. 更新 INDEX「名单」区计数为 `2 + 1`。
+
+跑 `python scripts/audit_graph.py ~/people --report` 时，若某仅名单成员
+已有档案但没链接，脚本会给一条 `[提示] 可升级为 [[名]]`。
+
+---
+
 ## 初始化完成后的目录
 
 ```
@@ -262,9 +317,12 @@ type: tag
 ├── INDEX.md
 ├── .trash/
 ├── templates/
-│   └── contact.md
+│   ├── contact.md
+│   └── roster.md
 ├── contacts/
 │   └── 陈默.md
+├── rosters/
+│   └── 班级-2026.md
 └── tags/
     ├── school/
     │   └── 北京大学.md
@@ -275,3 +333,5 @@ type: tag
 ```
 
 后续录入新联系人时，重复步骤 6a–6f：先搜 INDEX → 创建联系人 → 按需创建 tag → 更新 INDEX → 验证 wiki-links。
+新名单同理：复制 `templates/roster.md` → `rosters/{名单名}.md` → 填成员表 → 更新 INDEX「名单」区。
+名单成员熟络后按 7c 升级为已登记。

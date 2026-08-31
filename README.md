@@ -10,20 +10,23 @@
 
 - "帮我建一个关系图谱 vault，放在 `~/people/`"
 - "记一下这个人：xxx"
+- "记一下全班名单"
 - "谁可以帮我搞 xxx？"
 
-Claude 会自动按 skill 流程初始化 vault、录入联系人、维护索引。
+Claude 会自动按 skill 流程初始化 vault、录入联系人、维护名单和索引。
 
 ## Vault 结构
 
 ```
 vault-root/
 ├── README.md              # 设计决策 + 使用约定
-├── INDEX.md               # 联系人总览 + 三层标签导航
+├── INDEX.md               # 联系人总览 + 名单导航 + 三层标签导航
 ├── .trash/                # 归档旧文件（不用 rm）
 ├── contacts/              # 每人一个 .md 文件
+├── rosters/               # 每份公共名单一个文件（班级、竞赛队……）
 ├── templates/
-│   └── contact.md         # 联系人模板
+│   ├── contact.md         # 联系人模板
+│   └── roster.md          # 名单模板
 └── tags/
     ├── school/            # 学校标签
     ├── field/             # 方向/领域标签
@@ -41,11 +44,12 @@ vault-root/
 
 ## 文档
 
-- `SKILL.md` — 完整 skill 定义（初始化流程、录入、审计、冲突处理、标签管理）
+- `SKILL.md` — 完整 skill 定义（初始化流程、录入、名单管理、审计、冲突处理、标签管理）
 - `assets/onboarding-example.md` — 从零初始化 + 第一个联系人录入的完整示例
 - `assets/contact-template.md` — 联系人布局模板（正文 YAML 块 + 四个小节）
+- `assets/roster-template.md` — 名单布局模板（触发场景 + 成员表格）
 - `assets/INDEX-template.md` — INDEX.md 骨架模板
-- `scripts/audit_graph.py` — 图谱完整性审计脚本（断链、孤立节点、冗余边）
+- `scripts/audit_graph.py` — 图谱完整性审计脚本（断链、孤立节点、冗余边、名单校验）
 
 ## TODO
 
