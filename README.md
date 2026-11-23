@@ -12,6 +12,7 @@
 - "记一下这个人：xxx"
 - "记一下全班名单"
 - "谁可以帮我搞 xxx？"
+- "（粘贴/转发聊天记录或截图）这段里能读出什么信息？记一下谁还打 ACM"
 
 Claude 会自动按 skill 流程初始化 vault、录入联系人、维护名单和索引。
 
@@ -49,7 +50,8 @@ vault-root/
 - `assets/contact-template.md` — 联系人布局模板（正文 YAML 块 + 四个小节）
 - `assets/roster-template.md` — 名单布局模板（触发场景 + 成员表格）
 - `assets/INDEX-template.md` — INDEX.md 骨架模板
-- `scripts/audit_graph.py` — 图谱完整性审计脚本（断链、孤立节点、冗余边、名单校验）
+- `scripts/audit_graph.py` — 图谱审计脚本：断链、孤立、名单状态（含「本人」）、INDEX 自动对账（坏行/计数/导航/断链/纯文本伪标签/检索列昵称/**触发标签格漂移**）、标签页成员双向核对、YAML schema、平台 ID 碰撞、last_contact 格式与陈旧；`--report` 全量报告、`--json` 机器可读、`--strict` 门禁；缺 pyyaml 自动降级为纯结构审计（YAML 相关检查显式声明跳过，`--strict` 拒绝降级运行）
+- `scripts/test_audit_graph.py` — 审计脚本回归测试（stdlib unittest）
 
 ## TODO
 
